@@ -25,9 +25,9 @@ let evolve [w][h] (grid: [w][h]i32): [w][h]i32 =
   in tabulate_2d w h f
 
 let evolve_fixed_point [h][w] (orig_grid: [h][w]i32): [h][w]i32 =
-  (loop (grid, continue) = (orig_grid, true) while continue do
+  (loop (grid, continue, i) = (orig_grid, true, 0i32) while continue do
    let grid' = evolve grid
-   in (grid', grid' != grid)) |> (.1)
+   in (grid', if i%25 == 0 then any (== -1) (flatten grid') else true, i + 1)) |> (.1)
 
 let index_of [n] 't (p: t -> bool) (ts: [n]t): i32 =
   let f (x, i) (y, j) =
