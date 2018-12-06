@@ -36,6 +36,12 @@ let index_of [n] 't (p: t -> bool) (ts: [n]t): i32 =
     else (y, j)
   in reduce_comm f (false, -1) (zip (map p ts) (iota n)) |> (.2)
 
+let histogram [n] (k: i32) (xs: [n]i32): [k]i32 =
+  reduce_by_index (replicate k 0) (+) 0 xs (replicate n 1)
+
+let count 't (f: t -> bool) (ts: []t): i32 =
+  map f ts |> map i32.bool |> i32.sum
+
 entry part1 [num_points] (input: [num_points][2]i32) =
   let points = parse input
   let max_x = points |> map (.x) |> i32.maximum |> (+1)
@@ -43,10 +49,10 @@ entry part1 [num_points] (input: [num_points][2]i32) =
   let grid = tabulate_2d max_x max_y (\x y -> index_of (=={x,y}) points)
              |> evolve_fixed_point
   let edge = grid[0] ++ grid[max_x-1] ++ grid[:,0] ++ grid[:,max_y-1]
-  let not_on_edge i = !(any (==i) edge)
-  let area_per_point = reduce_by_index (replicate num_points 0) (+) 0
-                       (flatten grid) (replicate (max_x*max_y) 1)
-  in map2 (*) area_per_point (map (not_on_edge >-> i32.bool) (iota num_points)) |> i32.maximum
+  let on_edge i = any (==i) edge
+  let area_per_point = flatten grid |> histogram num_points
+  in pick (map on_edge (iota num_points)) (replicate num_points 0) area_per_point
+     |> i32.maximum
 
 let distance (p1: pos) (p2: pos): i32 =
   i32.abs(p1.x-p2.x) + i32.abs(p1.y-p2.y)
@@ -55,7 +61,6 @@ entry part2 [num_points] (input: [num_points][2]i32) =
   let points = parse input
   let max_x = points |> map (.x) |> i32.maximum |> (+1)
   let max_y = points |> map (.y) |> i32.maximum |> (+1)
+  let f x y = map (distance {x,y}) points |> i32.sum
   let limit = 10000
-  let f x y = map (distance {x,y}) points |> i32.sum |> (<limit)
-  let grid = tabulate_2d max_x max_y f
-  in flatten grid |> map i32.bool |> i32.sum
+  in tabulate_2d max_x max_y f |> flatten |> count (<limit)
