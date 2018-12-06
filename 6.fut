@@ -20,7 +20,7 @@ let evolve [w][h] (grid: [w][h]i32): [w][h]i32 =
         else if n >= 0 then (if matches n e && matches n s && matches n w then n else -2)
         else if e >= 0 then (if matches e n && matches e s && matches e w then e else -2)
         else if s >= 0 then (if matches s n && matches s e && matches s w then s else -2)
-        else if w >= 0 then (if matches w n && matches w e && matches w s then w else-2)
+        else if w >= 0 then (if matches w n && matches w e && matches w s then w else -2)
         else c)
   in tabulate_2d w h f
 
