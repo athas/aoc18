@@ -9,7 +9,7 @@ let check_all_points [num_points] (points: [num_points]pos) (h: i32) (w: i32): [
   let f (x: (i32, i32)) (y: (i32, i32)) =
     if x.1 == y.1 then (x.1, -2)
     else if x.1 < y.1 then x else y
-  let on_point x y = reduce f (h*w, -1) (zip (map (distance {x,y}) points) (iota num_points))
+  let on_point x y = reduce_comm f (h*w, -1) (zip (map (distance {x,y}) points) (iota num_points))
   in tabulate_2d h w on_point |> map (map (.2))
 
 let histogram [n] (k: i32) (xs: [n]i32): [k]i32 =
