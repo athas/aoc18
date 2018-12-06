@@ -1,9 +1,3 @@
--- Cellular automata!
---
--- Each cell value is the index of the closest point.
---
--- We use -1 to represent 'undetermined' and -2 to represent 'multiple equally distant'.
-
 type pos = {x:i32, y:i32}
 
 let distance (p1: pos) (p2: pos): i32 =
