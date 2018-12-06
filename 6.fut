@@ -36,15 +36,6 @@ let index_of [n] 't (p: t -> bool) (ts: [n]t): i32 =
     else (y, j)
   in reduce_comm f (false, -1) (zip (map p ts) (iota n)) |> (.2)
 
--- (index, value)
-let argmax (xs: []i32): (i32, i32) =
-  let f (i, x) (j, y) =
-    if x > y then (i, x)
-    else if y < x then (j, y)
-    else if i > j then (i, x)
-    else (j, y)
-  in reduce_comm f (-1, 0) (zip (iota (length xs)) xs)
-
 entry part1 [num_points] (input: [num_points][2]i32) =
   let points = parse input
   let max_x = points |> map (.x) |> i32.maximum |> (+1)
