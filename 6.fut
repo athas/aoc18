@@ -6,9 +6,8 @@ let distance (p1: pos) (p2: pos): i32 =
 let parse: [][2]i32 -> []pos = map (\r -> {x=r[0], y=r[1]})
 
 let check_all_points [num_points] (points: [num_points]pos) (h: i32) (w: i32): [h][w]i32 =
-  let f (x: (i32, i32)) (y: (i32, i32)) =
-    if x.1 == y.1 then (x.1, -2)
-    else if x.1 < y.1 then x else y
+  let f x y = if x.1 == y.1 then (x.1, -2)
+              else if x.1 < y.1 then x else y
   let on_point x y = reduce_comm f (h*w, -1) (zip (map (distance {x,y}) points) (iota num_points))
   in tabulate_2d h w on_point |> map (map (.2))
 
