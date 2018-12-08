@@ -1,10 +1,12 @@
+entry part1 = i32.sum
+
 let occurences_in (x: i32) (ys: []i32): i32 =
   map (==x) ys |> map (i32.bool) |> i32.sum
 
 let member (x: i32) (ys: []i32): bool =
   any (==x) ys
 
-let main (xs: []i32) =
+entry part2 (xs: []i32) =
   let (first_repeat, _, _) =
     (loop (cur, seen, continue) = (0, [0], true) while continue do
      let new_freqs = scan (+) 0 xs |> map (+cur)
