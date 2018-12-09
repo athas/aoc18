@@ -2,24 +2,24 @@
 --
 -- But it is how Knuth would do linked lists.
 
-type link = {next: i32, prev: i32, value: i32}
+type link = {next: i32, prev: i32}
 
 let insert_marble where i (links: *[]link): *[]link =
   let following_id = links[where].next
   let following = links[following_id]
   let following_following_id = following.next
-  let links[i] = {prev=following_id, next=following.next, value=i}
+  let links[i] = {prev=following_id, next=following.next}
   let links[following_id] = links[following_id] with next = i
   let links[following_following_id] = links[following_following_id] with prev = i
   in links
 
 let remove_marble where (links: *[]link): (*[]link, i32) =
-  let {prev=prev_id, next=next_id, value} = links[where]
+  let {prev=prev_id, next=next_id} = links[where]
   let prev = links[prev_id]
   let next = links[next_id]
   let links[prev_id] = prev with next = next_id
   let links[next_id] = next with prev = prev_id
-  in (links, value)
+  in (links, where)
 
 let move where (n: i32) (links: []link): i32 =
   if n > 0
@@ -28,7 +28,7 @@ let move where (n: i32) (links: []link): i32 =
 
 let game (num_players: i32) (highest_marble: i32) =
   let num_marbles = highest_marble + 1
-  let links = replicate num_marbles {next=0, prev=0, value=0}
+  let links = replicate num_marbles {next=0, prev=0}
   let points = replicate num_players 0u64
   let cur = 0
   let (_, points, _) =
