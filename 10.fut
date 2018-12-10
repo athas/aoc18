@@ -23,7 +23,11 @@ let distance (p1: particle) (p2: particle) =
 let neighbours (p1: particle) (p2: particle) =
   distance_x p1 p2 <= 1 && distance_y p1 p2 <= 1 && p1 != p2
 
-let move (n: i32) (p: particle) = p with pos = {x=p.pos.x + p.vel.dx * n, y=p.pos.y + p.vel.dy * n}
+let move (n: i32) (p: particle) =
+  p with pos = {x=p.pos.x + p.vel.dx * n, y=p.pos.y + p.vel.dy * n}
+
+let simulate (ps: []particle) (t: i32) =
+  map (move t) ps
 
 let converged (ps: []particle) =
   all (\p -> any (neighbours p) ps) ps
@@ -37,10 +41,10 @@ let min_to_converge (ps: []particle): i32 =
        in ps |> map (\p -> map (min_to p) ps |> i32.minimum) |> i32.maximum)
   in i32.max (f distance_x) (f distance_y)
 
-entry solve (input: [][4]i32) =
+let solve (input: [][4]i32) =
   let particles = map parse input
   let n = min_to_converge particles
-  let particles = map (move n) particles
+  let particles = simulate particles n
   let min_x = particles |> map (.pos.x) |> i32.minimum
   let min_y = particles |> map (.pos.y) |> i32.minimum
   let max_x = particles |> map (.pos.x) |> i32.maximum
@@ -51,10 +55,30 @@ entry solve (input: [][4]i32) =
   let w = max_x - min_x + 1
   let h = max_y - min_y + 1
   let blank_canvas = replicate (h*w) 0u8
-  let raster p = (p.pos.y - min_y) * w + (p.pos.x - min_x)
+  let raster (p: particle) = (p.pos.y - min_y) * w + (p.pos.x - min_x)
   let image = scatter blank_canvas (map raster particles) (replicate (h*w) 1u8)
   in (n, unflatten h w image)
 
 entry part1 = solve >-> (.2)
 
 entry part2 = solve >-> (.1)
+
+let box (ps: []particle) =
+  let minx = ps |> map (.pos.x) |> i32.minimum
+  let maxx = ps |> map (.pos.x) |> i32.maximum
+  let miny = ps |> map (.pos.y) |> i32.minimum
+  let maxy = ps |> map (.pos.y) |> i32.maximum
+  in (minx, miny, maxx-minx, maxy-miny)
+
+entry mebeim (input: [][4]i32) =
+  let particles = map parse input
+  let (t, _) =
+    loop (t1, t2) = (0, 100000) while t1 != t2 do
+    let t = (t1 + t2) / 2
+    let l = (box(simulate particles (t - 1))).4
+    let m = (box(simulate particles (t    ))).4
+    let r = (box(simulate particles (t + 1))).4
+    in if l > m && m < r then (t, t)
+       else if l < m then (t1, t)
+       else (t, t2)
+  in t
