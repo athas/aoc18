@@ -75,10 +75,11 @@ entry mebeim (input: [][4]i32) =
   let (t, _) =
     loop (t1, t2) = (0, 100000) while t1 != t2 do
     let t = (t1 + t2) / 2
-    let l = (box(simulate particles (t - 1))).4
-    let m = (box(simulate particles (t    ))).4
-    let r = (box(simulate particles (t + 1))).4
-    in if l > m && m < r then (t, t)
+    let sims = map (\d -> (box(simulate particles (t + d))).4) [-1, 0, 1]
+    let l = sims[0]
+    let m = sims[1]
+    let r = sims[2]
+    in trace (if l > m && m < r then (t, t)
        else if l < m then (t1, t)
-       else (t, t2)
+       else (t, t2))
   in t
