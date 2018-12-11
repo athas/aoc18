@@ -28,14 +28,19 @@ entry part1 serial =
   |> maximum_by_key (.2) ((-1,-1), i32.lowest)
   |> (.1)
 
-let greatest_square_at serial (x0, y0) =
-  loop (max_d, v) = (0, 0) for d < i32.min (300-x0) (300-y0) do
-  let k = sum_square_at serial d x0 y0
+let greatest_square_at area x0 y0 =
+  loop (max_d, v) = (0, 0i32) for d < i32.min (300-x0) (300-y0) do
+  let k = unsafe area[x0, y0] + area[x0+d, y0+d] - area[x0+d, y0] - area[x0, y0+d]
   in if k > v then (d, k) else (max_d, v)
 
 entry part2 serial =
-  tabulate_2d 299 299 (\x y -> (x+1, y+1))
-  |> flatten
-  |> map (tag (greatest_square_at serial))
-  |> maximum_by_key (\(_, (_, x)) -> x) ((-1,-1), (0, 0))
-  |> (\((x,y), (d, _)) -> (x, y, d))
+  let power = tabulate_2d 300 300 (\x y -> (x+1, y+1)) |> map (map (uncurry (power_level serial)))
+  let area = power
+             |> map (scan (+) 0)
+             |> transpose
+             |> map (scan (+) 0)
+             |> transpose
+  let ((x,y), (d, _)) =
+    tabulate_2d 299 299 (\x y -> ((x+2,y+2), greatest_square_at area x y))
+    |> flatten |> maximum_by_key (\(_, (_, x)) -> x) ((-1,-1), (0, 0))
+  in (x, y, d)
