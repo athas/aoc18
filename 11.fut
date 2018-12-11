@@ -1,5 +1,6 @@
--- This brute-force solution is crazy inefficient, but Futhark makes
--- it work.  I cannot believe this is how it's supposed to be done.
+-- Part 1 is brute force.  Part 2 Uses a summed-area table computed
+-- via two segmented scans:
+-- https://en.wikipedia.org/wiki/Summed-area_table
 
 let hundreds_digit (x: i32) = (x % 1000) / 100
 
