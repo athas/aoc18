@@ -3,7 +3,7 @@
 
 let brew (k: i32) =
   let elves = [0,1]
-  let recipes = [3,7] ++ replicate (k+10) 0i32 -- FIXME: i32 suffix necessary to avoid consumption.
+  let recipes = [3,7] ++ replicate (k+10) 0
   let num_recipes = 2
   let (recipes, _, _) =
     loop (recipes, elves, num_recipes) while num_recipes < k+10 do
