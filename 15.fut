@@ -142,7 +142,7 @@ let run [h][w] elf_damage (cells: *[h][w]cell) =
 entry part1 (input: [][]i32) =
   let cells = map (map cell_from_ascii) input
   let (cells, inhabitants, steps) = run 3 cells
-  let ascii = map (map cell_to_ascii) cells
+  let _ascii = map (map cell_to_ascii) cells
   in inhabitants |> map (\(x,y) -> cell_health cells[x,y]) |> i32.sum |> (*(steps-1))
 
 let count_elves cells = cells |> flatten |> filter (cell_inhabitant >-> (== #elf)) |> length
