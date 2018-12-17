@@ -1,3 +1,7 @@
+-- Massively parallel brute force with a cellular automaton covering
+-- the _entire_ space for each iteration.  This is hilariously
+-- inefficient, so good thing I have a 10TFLOPS GPU!
+
 type cell =
   #clay | #sand | #water | #water_rest | #water_resting_from_west | #water_resting_from_east
 
