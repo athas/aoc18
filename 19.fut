@@ -104,9 +104,9 @@ entry codehisto (steps: i32) (ipr: i32) (input: [][]i32) =
   let code = map parse input
   let history = replicate (length input) 0i32
   let m = new_machine ipr code with r.r0 = 1
-  let (history, _) = (loop (history, m) for _i < steps do
-                      let history[get_ip m] = history[get_ip m] + 1
-                      in (history, step m))
+  let (history, _) = loop (history, m) for _i < steps do
+                     let history[get_ip m] = history[get_ip m] + 1
+                     in (history, step m)
   in history
 
 -- You'll need to find y on your own.
