@@ -33,7 +33,8 @@ type time = { torch: i32
 
 let not_reached: time = { torch = i32.highest/2
                         , gear = i32.highest/2
-                        , neither = i32.highest/2 }
+                        , neither = i32.highest/2
+                        }
 
 let move (from: time, fromkind: i32) (tokind: i32): time =
   match (fromkind, tokind)
