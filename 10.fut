@@ -56,12 +56,12 @@ let solve (input: [][4]i32) =
   let h = max_y - min_y + 1
   let blank_canvas = replicate (h*w) 0u8
   let raster (p: particle) = (p.pos.y - min_y) * w + (p.pos.x - min_x)
-  let image = scatter blank_canvas (map raster particles) (replicate (h*w) 1u8)
+  let image = scatter blank_canvas (map raster particles) (map (const 1) particles)
   in (n, unflatten h w image)
 
-entry part1 = solve >-> (.2)
+entry part1 input = input |> solve |> (.1)
 
-entry part2 = solve >-> (.1)
+entry part2 input = input |> solve |> (.0)
 
 let box (ps: []particle) =
   let minx = ps |> map (.pos.x) |> i32.minimum
@@ -75,7 +75,7 @@ entry mebeim (input: [][4]i32) =
   let (t, _) =
     loop (t1, t2) = (0, 100000) while t1 != t2 do
     let t = (t1 + t2) / 2
-    let sims = map (\d -> (box(simulate particles (t + d))).4) [-1, 0, 1]
+    let sims = map (\d -> (box(simulate particles (t + d))).3) [-1, 0, 1]
     let l = sims[0]
     let m = sims[1]
     let r = sims[2]

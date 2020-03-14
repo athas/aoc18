@@ -4,7 +4,7 @@
 
 -- The array of patterns is indexed by the neighbourhood of a cell
 -- viewed as a binary number (with plant=1).
-type patterns = []bool
+type~ patterns = []bool
 
 let pattern (pat: [5]i32): i32 =
   let bit x i = (x&1) << i
@@ -18,13 +18,13 @@ let parse_patterns (patterns_raw: [][6]i32): patterns =
   let (patterns, to) = unzip (map parse_pattern patterns_raw)
   in scatter scratch patterns to
 
-let evolve (patterns: patterns) (state: []bool): *[]bool =
+let evolve [n] (patterns: patterns) (state: [n]bool) =
   let get i = if i < 0 || i >= length state then 0 else unsafe i32.bool state[i]
   let new_cell i = unsafe patterns[pattern [get (i-2), get (i-1), get i, get (i+1), get (i+2)]]
-  in tabulate (length state) new_cell
+  in tabulate n new_cell
 
-let sum_live_pots (shift: i64) (state: []bool) =
-  map2 (*) (map i64.bool state) (map (+shift) (iota (length state) |> map i64.i32))
+let sum_live_pots [n] (shift: i64) (state: [n]bool) =
+  map2 (*) (map i64.bool state) (map (+shift) (iota n |> map i64.i32))
   |> i64.sum
 
 entry part1 (initial_raw: []i32) (patterns_raw: [][6]i32) =
@@ -33,15 +33,16 @@ entry part1 (initial_raw: []i32) (patterns_raw: [][6]i32) =
   let initial = replicate generations false ++
                 map bool.i32 initial_raw ++
                 replicate generations false
-  let final_state = iterate generations (evolve patterns) initial
+  let final_state = loop s = initial for _i < generations do evolve patterns s
   in sum_live_pots (i64.i32 (-generations)) final_state
 
-type state = {shift: i32, cells: []bool}
+type~ state = {shift: i32, cells: []bool}
 
 let state_match [n] (x: [n]bool) (y: [n]bool) =
   let yget r i = let j = r+i
                  in if j < 0 || j >= n then false else unsafe y[j]
-  in pick (tabulate (n-1) (\r -> map2 (==) x (map (yget (r+1)) (iota n)) |> and))
+  in map3 (\b x y -> if b then x else y)
+          (tabulate (n-1) (\r -> map2 (==) x (map (yget (r+1)) (iota n)) |> and))
           (map (+1) (iota (n-1)))
           (replicate (n-1) i32.highest)
       |> i32.minimum

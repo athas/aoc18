@@ -26,8 +26,8 @@ entry part1 serial =
   tabulate_2d 298 298 (\x y -> (x+1, y+1))
   |> flatten
   |> map (tag (square_total serial))
-  |> maximum_by_key (.2) ((-1,-1), i32.lowest)
-  |> (.1)
+  |> maximum_by_key (.1) ((-1,-1), i32.lowest)
+  |> (.0)
 
 let greatest_square_at area x0 y0 =
   loop (max_d, v) = (0, 0i32) for d < i32.min (300-x0) (300-y0) do

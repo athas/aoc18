@@ -48,7 +48,7 @@ let step [n] (world: *[][]i32)
     let (states, num_states) =
       loop (states, num_states)
       for i in stack_top-to_pop..<stack_top do
-      add_states (states, num_states) (stack[i].1, stack[i].2)
+      add_states (states, num_states) (stack[i].0, stack[i].1)
     let stack[stack_top-to_pop-1] = (states, num_states, new_to_pop)
     in (world, (stack, stack_top-to_pop))
   case '|' ->
@@ -63,21 +63,20 @@ let step [n] (world: *[][]i32)
     let stack[stack_top-1] = (states, num_states, to_pop)
     in (world, (stack, stack_top))
 
-let build_maze (input: []i32) =
+let build_maze (k: i32) (input: []i32) =
   let input = input |> tail |> init
-  let k = 500 -- half of world edge size.
   let n = 2000 -- max number of NFA states.
   let world = replicate k (replicate k '#')
   let pos = (k/2, k/2)
-  let world[pos.1, pos.2] = '.'
+  let world[pos.0, pos.1] = '.'
   let states = (replicate n pos, 1, 1)
   let stack = (replicate (length input) states, 1)
   let (world, _) = loop (world, stack) for c in input do step world stack c
   in (world, pos)
 
 let room_distances (input: []i32) =
-  let (maze, pos) = build_maze input
-  let k = length maze
+  let k = 500 -- half of world edge size.
+  let (maze, pos) = build_maze k input
 
   -- OK, we have the maze; now to find the most distant room.  I will
   -- do this with a stencil, because I do everything with a stencil.
@@ -85,7 +84,7 @@ let room_distances (input: []i32) =
   let wall = i32.highest/2
   let not_reached = wall-1
   let grid = map (map (\c -> if c == '#' then wall else not_reached)) maze
-  let grid[pos.1, pos.2] = 0
+  let grid[pos.0, pos.1] = 0
   let continue = true
   let (grid, _) =
     loop (grid, continue) while continue do

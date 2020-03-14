@@ -74,7 +74,7 @@ let step [h][w] water_x (world: [h][w]cell): [h][w]cell =
 let step_until_fixed_point water_x (world: [][]cell): [][]cell =
   (loop (world, continue) = (world, true) while continue do
    let world' = step water_x world
-   in (world', world != world')).1
+   in (world', world != world')).0
 
 entry part1 (input: [][2]i32) =
   let (water_x, world) = parse_world input

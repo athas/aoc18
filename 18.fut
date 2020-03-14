@@ -54,7 +54,7 @@ entry part1 (input: [][]i32) =
 
 let find_repeat [h] (history: [h][][]cell) =
   let truths = map (\x -> map (==x) history) history
-  in tabulate_2d h h (\i j -> ((i,j), i!=j && truths[i,j])) |> flatten |> filter (.2) |> map (.1)
+  in tabulate_2d h h (\i j -> ((i,j), i!=j && truths[i,j])) |> flatten |> filter (.1) |> map (.0)
 
 -- Bloody loop detection again!
 entry part2 (input: [][]i32) =

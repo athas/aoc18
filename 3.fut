@@ -32,7 +32,7 @@ let grid_claims areas: [][]i32 =
   let max_x = map area_span_x areas |> i32.maximum
   let max_y = map area_span_y areas |> i32.maximum
   let points = areas |> expand area_num_pixels (area_get_pixel_flat max_x)
-  in reduce_by_index (replicate (max_x*max_y) 0) (+) 0 points (replicate (max_x*max_y) 1i32)
+  in reduce_by_index (replicate (max_x*max_y) 0) (+) 0 points (map (const 1) points)
      |> unflatten max_x max_y
 
 entry part1 (input: [][]i32) =

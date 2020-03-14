@@ -28,7 +28,10 @@ import "lib/github.com/diku-dk/segmented/segmented"
 import "lib/github.com/diku-dk/sorts/radix_sort"
 
 let nub 't (eq: t -> t -> bool) (ts: []t): []t =
-  map (.2) (filter (.1) (zip (map (!) (map2 eq ts (rotate 1 ts))) ts))
+  map (.1) (filter (.0) (zip (map (!) (map2 eq ts (rotate 1 ts))) ts))
+
+let zip' [n] [m] 'x 'y (xs: [n]x) (ys: [m]y) : [n](x,y) =
+  zip xs (ys :> [n]y)
 
 entry part2 (input: [][]i32) =
   let bots = map to_bot input
@@ -36,16 +39,16 @@ entry part2 (input: [][]i32) =
                     in [(d-r, 1), (d+r+1, -1)]
   let dist = map distf bots
                  |> flatten
-                 |> radix_sort_int_by_key (.1) i32.num_bits i32.get_bit
-  let flags = map2 (!=) (map (.1) dist) (rotate 1 (map (.1) dist))
-  let dist = zip (nub (==) (map (.1) dist))
-                 (segmented_reduce (+) 0i32 flags (map (.2) dist))
-  let run = zip (map (.1) dist)
-                (scan (+) 0 (map (.2) dist))
-  let max = i32.maximum (map (.2) run)
+                 |> radix_sort_int_by_key (.0) i32.num_bits i32.get_bit
+  let flags = map2 (!=) (map (.0) dist) (rotate 1 (map (.0) dist))
+  let dist = zip' (nub (==) (map (.0) dist))
+                  (segmented_reduce (+) 0i32 flags (map (.1) dist))
+  let run = zip' (map (.0) dist)
+                 (scan (+) 0 (map (.1) dist))
+  let max = i32.maximum (map (.1) run)
   let _ = trace run
-  let intervals = zip (init run) (tail run)
-                      |> filter ((.1) >-> (.2) >-> (==max))
+  let intervals = zip' (init run) (tail run)
+                      |> filter ((.0) >-> (.1) >-> (==max))
                       |> map (\((a,_),(b,_)) -> (a, b-1))
   in if any (\(a,b) -> a <= 0 && b >= 0) intervals
      then 0

@@ -59,7 +59,7 @@ let exec (op: op) (a: u32) (b: u32) (c: u32) (r: registers): registers =
                    case #eqrr -> i32.bool (x == y)
   in set c v r
 
-type machine = { ipr: u32, r: registers, code: []instruction }
+type~ machine = { ipr: u32, r: registers, code: []instruction }
 
 let get_ip (m: machine) = fetch m.ipr m.r
 let set_ip (m: machine) x = m with r = set m.ipr x m.r

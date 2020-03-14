@@ -12,14 +12,14 @@ let annihilate [n] (dir: i32) (units: [n]i8) =
                                in kind me != kind other ||
                                   polarisation me == polarisation other
                           else true
-  in map (.2) (filter (.1) (zip (map2 keep (iota n) units) units))
+  in map (.1) (filter (.0) (zip (map2 keep (iota n) units) units))
 
 let annihilate_fixed_point (units: []i8) =
   (loop (units, continue) = (units, true) while continue do
    let orig_len = length units
    let units' = units |> annihilate (-1) |> annihilate 1
    in (units', length units' != orig_len))
-  |> (.1)
+  |> (.0)
 
 entry part1 (units: []i8) =
   units |> annihilate_fixed_point |> length

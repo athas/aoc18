@@ -64,7 +64,7 @@ let shortest_paths [h][w] (cells: [h][w]cell) (source: inhabitant) =
           in (next, now != next))
   in (loop (dists, continue) = (dists, true) while continue do
         let (dists', changes) = tabulate_2d h w (update dists) |> map unzip |> unzip
-        in (dists', flatten changes |> or)).1
+        in (dists', flatten changes |> or)).0
 
 let creature_movement x y (cells: [][]cell) enemy =
   let {n,s,w,e} = shortest_paths cells enemy |> neighbourhood x y
@@ -124,8 +124,8 @@ let find_inhabitants [h][w] (cells: [h][w]cell): *[](i32,i32) =
   let is_creature c = c == #elf || c == #goblin in
   copy (tabulate_2d h w (\x y -> ((x,y), cell_inhabitant cells[x,y]))
         |> flatten
-        |> filter ((.2) >-> is_creature)
-        |> map (.1))
+        |> filter ((.1) >-> is_creature)
+        |> map (.0))
 
 let everybody_act [h][w] elf_damage inhabitants (cells: *[h][w]cell): *[h][w]cell =
   loop cells for (x,y) in inhabitants do act elf_damage x y cells

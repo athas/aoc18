@@ -59,7 +59,7 @@ let exec (op: op) (a: u32) (b: u32) (c: u32) (r: registers): registers =
                    case #eqrr -> i32.bool (x == y)
   in set c v r
 
-type machine = { ipr: u32, r: registers, code: []instruction }
+type~ machine = { ipr: u32, r: registers, code: []instruction }
 
 let get_ip (m: machine) = fetch m.ipr m.r
 let set_ip (m: machine) x = m with r = set m.ipr x m.r
@@ -86,7 +86,7 @@ let argmin [n] (xs: [n]i32): (i32, i32) =
     else if x < y then (i, x)
     else if i > j then (j, y)
     else (i, x)
-  in reduce_comm f (n, i32.highest) (zip (iota (length xs)) xs)
+  in reduce_comm f (n, i32.highest) (zip (iota n) xs)
 
 let argmax [n] (xs: [n]i32): (i32, i32) =
   let f (i, x) (j, y) =
@@ -94,7 +94,7 @@ let argmax [n] (xs: [n]i32): (i32, i32) =
     else if y < x then (i, x)
     else if i > j then (j, y)
     else (i, x)
-  in reduce_comm f (-1, 0) (zip (iota (length xs)) xs)
+  in reduce_comm f (-1, 0) (zip (iota n) xs)
 
 -- Brute force!  Use a beefy GPU for this.
 entry part1 (ipr: i32) (input: [][]i32) =
@@ -102,7 +102,7 @@ entry part1 (ipr: i32) (input: [][]i32) =
   let max_steps = 4000
   let range = 20000000
   let m = map (\i -> run (new_machine ipr code with r.r0 = i) max_steps) (iota range)
-  in map (.2) m |> argmin |> (.1)
+  in map (.1) m |> argmin |> (.0)
 
 -- For part2, use clever analysis that there is no room for in this
 -- margin.

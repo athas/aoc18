@@ -69,13 +69,13 @@ let minutes_histogram (ss: []sleep): [60]i32 =
   tabulate 60 (\m -> map (in_sleep m) ss |> map i32.bool |> i32.sum)
 
 -- (index, value)
-let argmax (xs: []i32): (i32, i32) =
+let argmax [n] (xs: [n]i32): (i32, i32) =
   let f (i, x) (j, y) =
     if x > y then (i, x)
     else if y < x then (j, y)
     else if i > j then (i, x)
     else (j, y)
-  in reduce_comm f (-1, 0) (zip (iota (length xs)) xs)
+  in reduce_comm f (-1, 0) (zip (iota n) xs)
 
 let max_guard_id: i32 = 4000 -- ckjaer did it first
 
@@ -94,12 +94,12 @@ entry part1 (raws: [][]i32) =
     (map (.who) sleeps) (map sleep_duration sleeps)
   let (most_sleepy, _) = argmax sleep_minutes
   let most_sleepy_sleeps = filter ((.who) >-> (==most_sleepy)) sleeps
-  in (most_sleepy * (most_sleepy_sleeps |> minutes_histogram |> argmax |> (.1)))
+  in (most_sleepy * (most_sleepy_sleeps |> minutes_histogram |> argmax |> (.0)))
 
 entry part2 (raws: [][]i32) =
   let events =
     events_from_raws raws
   let sleeps = sleeps events
   let guards_to_minute_focus = full_minutes_histogram sleeps |> map argmax
-  let most_focused = map (.2) guards_to_minute_focus |> argmax |> (.1)
-  in (most_focused * guards_to_minute_focus[most_focused].1)
+  let most_focused = map (.1) guards_to_minute_focus |> argmax |> (.0)
+  in (most_focused * guards_to_minute_focus[most_focused].0)

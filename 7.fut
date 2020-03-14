@@ -10,7 +10,7 @@ let topo_next [num_nodes] (removed: [num_nodes]bool) (inserted: [num_nodes]bool)
 
 let toposort (edges: [](i32, i32)): []i32 =
   -- num_nodes relies on a gross assumpption, but it's fast!
-  let num_nodes = i32.maximum (map (.2) edges) - i32.minimum (map (.1) edges) + 1
+  let num_nodes = i32.maximum (map (.1) edges) - i32.minimum (map (.0) edges) + 1
   let (_, order) =
     (loop (inserted, order) = (replicate num_nodes false, replicate num_nodes 0)
      for i < num_nodes do
@@ -38,7 +38,7 @@ let next_end (ws: [num_workers]worker) =
 
 entry part2 (input: [][]i32) =
   let edges = map (\r -> (r[0], r[1])) input
-  let num_nodes = i32.maximum (map (.2) edges) - i32.minimum (map (.1) edges) + 1
+  let num_nodes = i32.maximum (map (.1) edges) - i32.minimum (map (.0) edges) + 1
   let duration i = i + 61
   let (_, seconds, _, _, _) =
     loop (workers, now, num_done, removed, done) =

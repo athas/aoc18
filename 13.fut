@@ -77,7 +77,7 @@ let cell_track (x: cell) = (x >> 5)&1 == 1
 let cell_intersection (x: cell) = (x >> 7)&1 == 1
 let cell_has_cart (x: cell) = x & 1 == 1
 let cell_add_cart (x: cell) = x | 1
-let cell_remove_cart (x: cell) = x & ~1
+let cell_remove_cart (x: cell) = x & -1
 let is (x: cell) (y: cell) = (x & y) == y
 
 import "lib/github.com/diku-dk/sorts/merge_sort"
@@ -103,7 +103,7 @@ let parse [n][m] (input: [n][m]i32): (*[n][m]cell, *[]cart) =
                          else #south
                  in ((i,j,d,#left), cells[i,j] == cell_with_cart)
   let carts = tabulate_2d n m cart
-              |> flatten |> filter (.2) |> map (.1) |> merge_sort cartlte
+              |> flatten |> filter (.1) |> map (.0) |> merge_sort cartlte
   in (cells, copy carts)
 
 let cell_has_track [n][m] (cells: [n][m]cell) (x, y) =
@@ -125,7 +125,7 @@ let maybe_turn_cart cells ((x, y, d, t): cart): cart =
     else (d, t)
   in (x, y, d, t)
 
-let cart_pos (c: cart) = (c.1, c.2)
+let cart_pos (c: cart) = (c.0, c.1)
 
 let move_cart [n][m] (cells: *[n][m]cell) ((x, y, d, t): cart): (*[n][m]cell, cart, bool) =
   let (x', y') = move (x, y) d
@@ -149,14 +149,14 @@ entry part1 (max_steps: i32) (input: [][]i32) =
                       else collision
       in (cells, carts with [i] = cart, collision)
     in (cells, merge_sort cartlte carts, steps + 1, collision)
-  in (steps, collision.2, collision.1)
+  in (steps, collision.1, collision.0)
 
 let nullify_carts_at p (cells: *[][]cell) (carts: *[]cart): (*[][]cell, *[]cart) =
   let num_carts = length carts in
   loop (cells : *[][]cell, carts : *[]cart) for i < num_carts do
   let (x,y) = cart_pos carts[i]
   in if (x,y) == p then let new_cell = cell_remove_cart cells[x,y]
-                        let new_cart = (-1, -1, carts[i].3, carts[i].4) -- FIXME: use 'with'
+                        let new_cart = (-1, -1, carts[i].2, carts[i].3) -- FIXME: use 'with'
                         in (cells with [x,y] = new_cell,
                             carts with [i] = new_cart)
     else (cells, carts)

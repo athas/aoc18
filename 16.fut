@@ -84,7 +84,7 @@ let opcode_possibilities (code: u32) (exs: []example) =
   let correct op ex = if instruction_opcode ex.op == code
                       then example_valid op ex
                       else true
-  in copy all_ops |> filter (\op -> all (correct op) exs)
+  in filter (\op -> all (correct op) exs) all_ops
 
 let optable: []op =
   [#bani
