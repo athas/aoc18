@@ -32,17 +32,17 @@ let parse_world input: (i32, *[][]cell) =
   let min_y = input |> map (.[1]) |> i32.minimum
   let max_x = input |> map (.[0]) |> i32.maximum |> (+1) -- ???
   let max_y = input |> map (.[1]) |> i32.maximum
-  let w = max_x - min_x + 1
-  let h = max_y - min_y + 1
+  let w = i64.i32 (max_x - min_x + 1)
+  let h = i64.i32 (max_y - min_y + 1)
   let blank_world: *[]cell = replicate (h*w) #sand
-  let clays = map (\p -> (p[1]-min_y)*w+(p[0]-min_x)) input
+  let clays = map (\p -> i64.i32 (p[1]-min_y)*w+i64.i32(p[0]-min_x)) input
   let world = scatter blank_world clays (map (const #clay) clays)
               |> unflatten h w
   in (500-min_x, copy world)
 
 let step [h][w] water_x (world: [h][w]cell): [h][w]cell =
   let get y x: cell = if y >= 0 && x >= 0 && y < h && x < w
-                      then unsafe world[y,x] else #sand
+                      then world[y,x] else #sand
   let step' y x =
     let (n,w,e,s,sw,se) = (get (y-1) x, get y (x-1), get y (x+1), get (y+1) x,
                            get (y+1) (x-1), get (y+1) (x+1))
@@ -79,13 +79,13 @@ let step_until_fixed_point water_x (world: [][]cell): [][]cell =
 entry part1 (input: [][2]i32) =
   let (water_x, world) = parse_world input
   --  let world = iterate steps (step water_x) world
-  let world = step_until_fixed_point water_x world
+  let world = step_until_fixed_point (i64.i32 water_x) world
   let waters = flatten world |> map water |> map i32.bool |> i32.sum
   in waters -- map (map cell_to_ascii) world
 
 entry part2 (input: [][2]i32) =
   let (water_x, world) = parse_world input
   --  let world = iterate steps (step water_x) world
-  let world = step_until_fixed_point water_x world
+  let world = step_until_fixed_point (i64.i32 water_x) world
   let waters = flatten world |> map (==#water_rest) |> map i32.bool |> i32.sum
   in waters -- map (map cell_to_ascii) world

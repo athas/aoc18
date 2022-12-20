@@ -1,43 +1,43 @@
 -- Implementing an NFA with dynamic state deduplication in Futhark is
 -- the fucking worst.
 
-let dedup 't [n] (eq: t -> t -> bool) (xs: [n]t): (*[n]t, i32) =
+let dedup 't [n] (eq: t -> t -> bool) (xs: [n]t): (*[n]t, i64) =
   loop (new, i) = (replicate n xs[0], 0) for x in xs do
   if any (eq x) new[:i]
   then (new, i)
   else (new with [i] = x, i + 1)
 
-type pos = (i32, i32)
+type pos = (i64, i64)
 
-type dir = i32
+type dir = i64
 
-let delta (d: dir): (i32, i32) =
+let delta (d: dir): (i64, i64) =
   match d case 'W' -> (0, -1)
           case 'E' -> (0, 1)
           case 'N' -> (-1, 0)
           case 'S' -> (1, 0)
           case _ -> assert false (0,0)
 
-let walk [k] (world: *[k][k]i32) ((x,y): pos) (d: dir): (*[k][k]i32, pos) =
+let walk [k] (world: *[k][k]i64) ((x,y): pos) (d: dir): (*[k][k]i64, pos) =
   let (dx, dy) = delta d
   in (world
       with [x+dx,y+dy] = '.'
       with [x+dx+dx,y+dy+dy] = '.',
       (x+dx+dx, y+dy+dy))
 
-let add_states [n] (to_states: *[n]pos, to_num_states: i32)
-                   (from_states: [n]pos, from_num_states: i32)
-               : (*[n]pos, i32) =
+let add_states [n] (to_states: *[n]pos, to_num_states: i64)
+                   (from_states: [n]pos, from_num_states: i64)
+               : (*[n]pos, i64) =
   loop (to_states, to_num_states) for i < from_num_states do
   let (to_states, to_num_states) = if to_num_states == n then dedup (==) to_states
                                    else (to_states, to_num_states)
   let to_states[to_num_states] = from_states[i]
   in (to_states, to_num_states+1)
 
-let step [n] (world: *[][]i32)
-             (stack: *[]([n]pos,i32,i32), stack_top: i32)
-             (c: i32)
-           : (*[][]i32, (*[]([n]pos,i32,i32), i32))=
+let step [n] (world: *[][]i64)
+             (stack: *[]([n]pos,i64,i64), stack_top: i64)
+             (c: i64)
+           : (*[][]i64, (*[]([n]pos,i64,i64), i64))=
   let (states, num_states, to_pop) = (stack[stack_top-1]) in
   match c
   case '(' ->
@@ -63,7 +63,7 @@ let step [n] (world: *[][]i32)
     let stack[stack_top-1] = (states, num_states, to_pop)
     in (world, (stack, stack_top))
 
-let build_maze (k: i32) (input: []i32) =
+let build_maze (k: i64) (input: []i64) =
   let input = input |> tail |> init
   let n = 2000 -- max number of NFA states.
   let world = replicate k (replicate k '#')
@@ -74,14 +74,14 @@ let build_maze (k: i32) (input: []i32) =
   let (world, _) = loop (world, stack) for c in input do step world stack c
   in (world, pos)
 
-let room_distances (input: []i32) =
+let room_distances (input: []i64) =
   let k = 500 -- half of world edge size.
   let (maze, pos) = build_maze k input
 
   -- OK, we have the maze; now to find the most distant room.  I will
   -- do this with a stencil, because I do everything with a stencil.
   -- This is not my best trick.
-  let wall = i32.highest/2
+  let wall = i64.highest/2
   let not_reached = wall-1
   let grid = map (map (\c -> if c == '#' then wall else not_reached)) maze
   let grid[pos.0, pos.1] = 0
@@ -90,21 +90,21 @@ let room_distances (input: []i32) =
     loop (grid, continue) while continue do
     let get x y =
       if x >= 0 && y >= 0 && x < k && y < k
-      then grid[x,y] else i32.highest
+      then grid[x,y] else i64.highest
     let evolve x y =
       let (n, s, e, w, c) =
         (get (x-1) y, get (x+1) y,
          get x (y+1), get x (y-1),
          get x y)
       in if c == wall then c
-         else (n+1) `i32.min` (s+1) `i32.min` (e+1) `i32.min` (w+1) `i32.min` c
+         else (n+1) `i64.min` (s+1) `i64.min` (e+1) `i64.min` (w+1) `i64.min` c
     let new_grid = tabulate_2d k k evolve
     in (new_grid, new_grid != grid)
 
   in grid |> flatten |> map (\x -> if x==wall || x==not_reached then 0 else x/2)
 
-entry part1 (input: []i32) =
-  room_distances input |> i32.maximum
+entry part1 (input: []i64) =
+  room_distances input |> i64.maximum
 
-entry part2 (input: []i32) =
-  room_distances input |> map (>=1000) |> map i32.bool |> i32.sum |> (/2) |> (+1)
+entry part2 (input: []i64) =
+  room_distances input |> map (>=1000) |> map i64.bool |> i64.sum |> (/2) |> (+1)

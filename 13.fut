@@ -66,7 +66,7 @@ let turn (d: dir) (t: turn): dir =
   case (#west, #right) -> #north
   case (_, #straight) -> d
 
-let move (x: i32, y: i32) (d: dir) =
+let move (x: i64, y: i64) (d: dir) =
   match d
   case #south -> (x+1, y)
   case #north -> (x-1, y)
@@ -77,17 +77,17 @@ let cell_track (x: cell) = (x >> 5)&1 == 1
 let cell_intersection (x: cell) = (x >> 7)&1 == 1
 let cell_has_cart (x: cell) = x & 1 == 1
 let cell_add_cart (x: cell) = x | 1
-let cell_remove_cart (x: cell) = x & -1
+let cell_remove_cart (x: cell) = x & -1u8
 let is (x: cell) (y: cell) = (x & y) == y
 
 import "lib/github.com/diku-dk/sorts/merge_sort"
 
-type cart = (i32, i32, dir, turn)
+type cart = (i64, i64, dir, turn)
 
 let cartlte ((x1, y1, _, _): cart) ((x2, y2, _, _): cart): bool =
   x1 < x2 || x1 == x2 && y1 <= y2
 
-let parse [n][m] (input: [n][m]i32): (*[n][m]cell, *[]cart) =
+let parse [n][m] (input: [n][m]i64): (*[n][m]cell, *[]cart) =
   let cell c = if c == ' ' then empty_cell
                else if c == '>' || c == '<' || c == '^' || c == 'v'
                then cell_with_cart
@@ -135,11 +135,11 @@ let move_cart [n][m] (cells: *[n][m]cell) ((x, y, d, t): cart): (*[n][m]cell, ca
      let cells' = cells with [x,y] = a with [x', y'] = b
      in (cells', maybe_turn_cart cells' (x', y', d, t), collision)
 
-entry part1 (max_steps: i32) (input: [][]i32) =
+entry part1 (max_steps: i64) (input: [][]i64) =
   let (cells, carts) = parse input
   let num_carts = length carts
   let (_, _, steps, collision) =
-    loop (cells, carts, steps, collision) = (cells, carts, 0i32, (-1,-1))
+    loop (cells, carts, steps, collision) = (cells, carts, 0i64, (-1,-1))
     while collision == (-1,-1) && steps < max_steps do
     let (cells, carts, collision) =
       loop (cells, carts, collision) for i < num_carts do
@@ -161,7 +161,7 @@ let nullify_carts_at p (cells: *[][]cell) (carts: *[]cart): (*[][]cell, *[]cart)
                             carts with [i] = new_cart)
     else (cells, carts)
 
-entry part2 (max_steps: i32) (input: [][]i32) =
+entry part2 (max_steps: i64) (input: [][]i64) =
   let (cells, carts) = parse input
   let num_carts = length carts
   let (_, carts, steps, _) =

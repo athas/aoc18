@@ -55,7 +55,7 @@ let shortest_paths [h][w] (cells: [h][w]cell) (source: inhabitant) =
   -- The update function assumes that the borders are always boring.
   let update dists x y =
     (if x == 0 || y == 0 || x == h-1 || y == w-1 then (dists[x,y], false)
-     else let {n,s,w,e} = neighbourhood x y dists
+     else let {n,s,w,e} = neighbourhood (i32.i64 x) (i32.i64 y) dists
           let now = dists[x,y]
           let next = if cell_inhabitant cells[x,y] == source then 0
                      else if cell_inhabitant cells[x,y] == #floor
@@ -122,7 +122,7 @@ let act [h][w] elf_attack (x: i32) (y: i32) (cells: *[h][w]cell): *[h][w]cell =
 
 let find_inhabitants [h][w] (cells: [h][w]cell): *[](i32,i32) =
   let is_creature c = c == #elf || c == #goblin in
-  copy (tabulate_2d h w (\x y -> ((x,y), cell_inhabitant cells[x,y]))
+  copy (tabulate_2d h w (\x y -> ((i32.i64 x,i32.i64 y), cell_inhabitant cells[x,y]))
         |> flatten
         |> filter ((.1) >-> is_creature)
         |> map (.0))

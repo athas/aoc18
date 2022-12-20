@@ -18,9 +18,9 @@ type neighbourhood = {nw: cell, n: cell, ne: cell,
                       w: cell, c: cell, e: cell,
                       sw: cell, s: cell, se: cell}
 
-let neighbourhood [n][m] (x: i32) (y: i32) (cells: [n][m]cell): neighbourhood =
+let neighbourhood [n][m] (x: i64) (y: i64) (cells: [n][m]cell): neighbourhood =
   let get x' y' = if x' >= 0 && x' < n && y' >= 0 && y' < m
-                  then unsafe cells[x', y'] else #open
+                  then cells[x', y'] else #open
   in {nw=get (x-1) (y-1), n=get (x-1) y, ne = get (x-1) (y+1),
       w=get x (y-1), c=get x y, e = get x (y+1),
       sw=get (x+1) (y-1), s=get (x+1) y, se = get (x+1) (y+1)}
@@ -68,7 +68,7 @@ entry part2 (input: [][]i32) =
   let period = repeats_at - repeater
   let desired_steps = 1000000000
   let steps_to_go = (desired_steps - repeats_at) % period
-  let cells = iterate steps_to_go step history[repeats_at]
+  let cells = iterate (i32.i64 steps_to_go) step history[repeats_at]
   let num_lumberyards = cells |> flatten |> map (==#lumberyard) |> map i32.bool |> i32.sum
   let num_trees = cells |> flatten |> map (==#trees) |> map i32.bool |> i32.sum
   in num_lumberyards * num_trees

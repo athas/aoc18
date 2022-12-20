@@ -5,10 +5,10 @@ type unit = i8
 let polarisation (x: unit) = (x >> 5) & 1
 let kind (x: unit) = x % 32
 
-let annihilate [n] (dir: i32) (units: [n]i8) =
+let annihilate [n] (dir: i64) (units: [n]i8) =
   let keep i me =
     let j = i + (if i%2==0 then dir else -dir)
-    in if j >= 0 && j < n then let other = unsafe units[j]
+    in if j >= 0 && j < n then let other = units[j]
                                in kind me != kind other ||
                                   polarisation me == polarisation other
                           else true
@@ -24,13 +24,13 @@ let annihilate_fixed_point (units: []i8) =
 entry part1 (units: []i8) =
   units |> annihilate_fixed_point |> length
 
-let num_kinds = 'Z' - 'A' + 1
-let index_kinds i = i8.i32 ('A' + i)
+let num_kinds: i64 = 'Z' - 'A' + 1
+let index_kinds i = i8.i64 ('A' + i)
 
 entry part2 (units: []i8) =
   -- Shorten the array as much as possible immediately.
   let units = annihilate_fixed_point units
   let not_kind x y = kind x != kind y
   let check_without_kind i = part1 (filter (not_kind (index_kinds i)) units)
-  let f cur_best i = i32.min cur_best (check_without_kind i)
+  let f cur_best i = i64.min cur_best (check_without_kind i)
   in foldl f (length units) (iota num_kinds)

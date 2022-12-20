@@ -1,16 +1,16 @@
 -- This one is Death.
 
-let topo_next [num_nodes] (removed: [num_nodes]bool) (inserted: [num_nodes]bool) edges =
+let topo_next [num_nodes] (removed: [num_nodes]bool) (inserted: [num_nodes]bool) (edges: [](i64,i64)) =
   let satisfied inserted i (from, to) =
-    unsafe to != i || inserted[from]
+    to != i || inserted[from]
   let insertable inserted i =
-    if unsafe !removed[i] && all (satisfied inserted i) edges
-    then i else num_nodes
-  in map (insertable inserted) (iota num_nodes) |> i32.minimum
+    if !removed[i] && all (satisfied inserted (i64.i64 i)) edges
+    then i64.i64 i else i64.i64 num_nodes
+  in map (insertable inserted) (iota num_nodes) |> i64.minimum
 
-let toposort (edges: [](i32, i32)): []i32 =
+let toposort (edges: [](i64, i64)): []i64 =
   -- num_nodes relies on a gross assumpption, but it's fast!
-  let num_nodes = i32.maximum (map (.1) edges) - i32.minimum (map (.0) edges) + 1
+  let num_nodes = i64.i64 (i64.maximum (map (.1) edges) - i64.minimum (map (.0) edges) + 1)
   let (_, order) =
     (loop (inserted, order) = (replicate num_nodes false, replicate num_nodes 0)
      for i < num_nodes do
@@ -18,15 +18,15 @@ let toposort (edges: [](i32, i32)): []i32 =
      in (inserted with [next] = true, order with [i] = next))
   in order
 
-entry part1 (input: [][]i32) =
+entry part1 (input: [][]i64) =
   let edges = map (\r -> (r[0], r[1])) input
   in toposort edges
 
-type worker = {i:i32, t:i32}
+type worker = {i:i64, t:i64}
 let available: worker = {i= -1, t = 0}
 let busy = (!=available)
 
-let num_workers: i32 = 5
+let num_workers: i64 = 5
 
 let any_busy: []worker -> bool = foldl (\x w -> x || busy w) false
 
@@ -34,11 +34,11 @@ let find_available (ws: [num_workers]worker) =
   loop i = 0 while i < num_workers && busy ws[i] do i + 1
 
 let next_end (ws: [num_workers]worker) =
-  map (\w -> if busy w then w.t else i32.highest) ws |> i32.minimum
+  map (\w -> if busy w then w.t else i64.highest) ws |> i64.minimum
 
-entry part2 (input: [][]i32) =
+entry part2 (input: [][]i64) =
   let edges = map (\r -> (r[0], r[1])) input
-  let num_nodes = i32.maximum (map (.1) edges) - i32.minimum (map (.0) edges) + 1
+  let num_nodes = i64.i64 (i64.maximum (map (.1) edges) - i64.minimum (map (.0) edges) + 1)
   let duration i = i + 61
   let (_, seconds, _, _, _) =
     loop (workers, now, num_done, removed, done) =

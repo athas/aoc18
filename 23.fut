@@ -28,7 +28,7 @@ import "lib/github.com/diku-dk/segmented/segmented"
 import "lib/github.com/diku-dk/sorts/radix_sort"
 
 let nub 't (eq: t -> t -> bool) (ts: []t): []t =
-  map (.1) (filter (.0) (zip (map (!) (map2 eq ts (rotate 1 ts))) ts))
+  map (.1) (filter (.0) (zip (map not (map2 eq ts (rotate 1 ts))) ts))
 
 let zip' [n] [m] 'x 'y (xs: [n]x) (ys: [m]y) : [n](x,y) =
   zip xs (ys :> [n]y)

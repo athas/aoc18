@@ -1,7 +1,7 @@
 -- I'm only doing the first one here, because tree processing is
 -- pointlessly painful in Futhark.  This is not what I signed up for!
 
-entry part1 (xs: []i32) =
+entry part1 (xs: []i64) =
   let stack = replicate (length xs) (0,0)
   let stack[0] = (xs[0], xs[1])
   let (_, _, _, meta_sum) =

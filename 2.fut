@@ -5,8 +5,8 @@
 type box_id [n] = [n]i8
 type signature = {double: bool, triple: bool}
 
-let occurrences_in (x: i8) (ys: []i8): i32 =
-  map (==x) ys |> map (i32.bool) |> i32.sum
+let occurrences_in (x: i8) (ys: []i8): i64 =
+  map (==x) ys |> map (i64.bool) |> i64.sum
 
 -- Use a naive O(n**2) implementation here.  This can also be done
 -- with a segmented scan, but that is massively overkill for small box
@@ -18,16 +18,16 @@ let signature (x: box_id []): signature =
 entry part1 (ids: [](box_id [])) =
   ids
   |> map signature
-  |> map (\{double, triple} -> (i32.bool double, i32.bool triple))
+  |> map (\{double, triple} -> (i64.bool double, i64.bool triple))
   |> reduce_comm (\(a,b) (c,d) -> (a+c, b+d)) (0, 0)
   |> uncurry (*)
 
 let matching (x: box_id []) (y: box_id []): bool =
-  map2 (!=) x y |> map i32.bool |> i32.sum |> (==1)
+  map2 (!=) x y |> map i64.bool |> i64.sum |> (==1)
 
-let find_match [n] (x: box_id []) (ids: [n]box_id []): i32 =
+let find_match [n] (x: box_id []) (ids: [n]box_id []): i64 =
   map2 (\i y -> if matching x y then i else (-1)) (iota n) ids
-  |> i32.maximum
+  |> i64.maximum
 
 -- Since there are so few boxes in the input (250), let's just do a
 -- check of the Cartesian product.  This is twice the amount of work
